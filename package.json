@@ -1,0 +1,14 @@
+{
+  "name": "web-product-engineering-project",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The solving project built through Module Web Product Engineering",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/main.mjs",
+    "test": "node --check src/main.mjs && node --check src/http/server-core.mjs"
+  }
+}
