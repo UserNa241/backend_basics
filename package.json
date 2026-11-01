@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node src/main.mjs",
-    "test": "node --check src/main.mjs && node --check src/http/server-core.mjs"
+    "check": "node --check src/main.mjs && node --check src/http/server-core.mjs && node --check src/http/router.mjs",
+    "test": "node --test"
   }
 }
