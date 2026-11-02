@@ -19,7 +19,7 @@ function compilePattern(pattern) {
 
         if (segment === '*') {
             if (index !== rawSegments.length - 1) {
-                throw new Error(`Wildcard must be the final route segment: ${pattern}`);
+                throw new TypeError(`Wildcard must be the final route segment: ${pattern}`);
             }
 
             segments.push({type: 'wildcard'});
@@ -30,11 +30,11 @@ function compilePattern(pattern) {
             const name = segment.slice(1);
 
             if (!PARAM_NAME_PATTERN.test(name)) {
-                throw new Error(`Invalid route parameter name in pattern:"${pattern}"`);
+                throw new TypeError(`Invalid route parameter name in pattern:"${pattern}"`);
             }
 
             if (parameterNames.has(name)) {
-                throw new Error(`Duplicate route parameter name in pattern:"${pattern}"`);
+                throw new TypeError(`Duplicate route parameter name in pattern:"${pattern}"`);
             }
 
             parameterNames.add(name);
@@ -47,7 +47,7 @@ function compilePattern(pattern) {
                 segment.includes(':') || segment.includes('*') ||
                 segment.includes('?') || segment.includes('#')
         ) {
-            throw new Error(`Invalid static router segment in pattern:"${pattern}"`);
+            throw new TypeError(`Invalid static router segment in pattern:"${pattern}"`);
         }
 
         segments.push({type: 'static', value: segment});
@@ -228,15 +228,15 @@ export function createRouter() {
 
     function add(method, pattern, handler) {
         if (typeof method !== 'string' || method.trim() === '') {
-            throw new Error('Method must be a non-empty string');
+            throw new TypeError('Method must be a non-empty string');
         }
 
         if (typeof pattern !== 'string' || !pattern.startsWith('/')) {
-            throw new Error('Route pattern must be a string starting with "\"');
+            throw new TypeError('Route pattern must be a string starting with "\"');
         }
 
         if (typeof handler !== 'function') {
-            throw new Error('Route handler must be a function');
+            throw new TypeError('Route handler must be a function');
         }
 
         const normalizedMethod = method.trim().toUpperCase();
@@ -244,7 +244,7 @@ export function createRouter() {
         const shapeKey = createRouteShapeKey(normalizedMethod, segments);
 
         if (routeShapeKeys.has(shapeKey)) {
-            throw new Error(`Duplicate or equivalent route: ${normalizedMethod} ${pattern}`);
+            throw new TypeError(`Duplicate or equivalent route: ${normalizedMethod} ${pattern}`);
         }
 
         routeShapeKeys.add(shapeKey);
@@ -288,7 +288,7 @@ export function createRouter() {
     function match(method, target) {
 
         if (typeof method !== 'string' || method.trim() === '') {
-            throw new Error('Method must be a non-empty string');
+            throw new TypeError('Method must be a non-empty string');
         }
 
         const requestMethod = method.trim().toUpperCase();
@@ -371,13 +371,13 @@ export function createRouter() {
     function mount(prefix, childRouter) {
 
         if (typeof prefix !== 'string' || !prefix.startsWith('/')) {
-            throw new Error('Mount prefix must be a string starting with "/"');
+            throw new TypeError('Mount prefix must be a string starting with "/"');
         }
 
         const prefixSegments = compilePattern(prefix);
 
         if (prefixSegments.some((segment) => segment.type !== 'static')) {
-            throw new Error('Mount prefix may contain only static segments');
+            throw new TypeError('Mount prefix may contain only static segments');
         }
 
         const childInternals = routerInternals.get(childRouter);
@@ -392,15 +392,16 @@ export function createRouter() {
         for (const childRoute of childInternals.routes) {
             const effectiveSegments = [...prefixSegments, ...childRoute.segments];
             const effectivePattern =
-                prefix === '/' ? childRouter.pattern : childRouter.pattern === '/' ? prefix : `${prefix}${childRouter.pattern}`;
+                prefix === '/' ? childRoute.pattern : childRoute.pattern === '/' ? prefix : `${prefix}${childRoute.pattern}`;
             const shapeKey = createRouteShapeKey(childRoute.method, effectiveSegments,);
 
             if (routeShapeKeys.has(shapeKey) || stagedShapeKeys.has(shapeKey)) {
-                throw new TypeError(`Duplicate or equivalent route ${childRoute.method}${effectivePattern}`);
+                throw new TypeError(`Duplicate or equivalent route ${childRoute.method} ${effectivePattern}`);
             }
 
             stagedShapeKeys.add(shapeKey);
             stagedRoutes.push({
+                shapeKey,
                 route: {
                     method: childRoute.method,
                     pattern: effectivePattern,

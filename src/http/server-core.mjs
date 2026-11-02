@@ -1,5 +1,6 @@
 
-import {createServer} from 'node::http';
+import {createServer} from 'node:http';
+import {setTimeout as setTimeoutNative} from 'node:timers';
 
 const MAX_TIMER_MS = 2_147_483_647;
 
@@ -32,7 +33,7 @@ export function createHttpServerCore(options = {}) {
 
     assertIntegerInRange('port', port, 0, 65_535);
     assertIntegerInRange('headersTimeoutMs', headersTimeoutMs, 1, MAX_TIMER_MS);
-    assertIntegerInRange('requestTimeoutMs', requestListener, 1, MAX_TIMER_MS);
+    assertIntegerInRange('requestTimeoutMs', requestTimeoutMs, 1, MAX_TIMER_MS);
     assertIntegerInRange('KeepAliveTimeoutMs', keepAliveTimeoutMs, 0, MAX_TIMER_MS);
     assertIntegerInRange('socketTimeoutMs', socketTimeoutMs, 0, MAX_TIMER_MS);
     assertIntegerInRange('shutdownTimeoutMs', shutdownTimeoutMs, 1, MAX_TIMER_MS);
@@ -166,7 +167,7 @@ export function createHttpServerCore(options = {}) {
             server.close(onServerClosed);
             server.closeIdleConnections();
 
-            forceCloseTimer = setTimeout(() => {
+            forceCloseTimer = setTimeoutNative(() => {
                 for (const socket of sockets) {
                     socket.destroy();
                 }

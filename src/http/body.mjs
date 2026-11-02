@@ -73,7 +73,7 @@ export async function readBoundedBody(req, options = {}) {
     }
 
     if (options === null ||
-    typeof options === 'object' ||
+    typeof options !== 'object' ||
     Array.isArray(options)) {
         throw new TypeError('Bounded body reader options must be an object')
     }
@@ -115,6 +115,8 @@ export async function readBoundedBody(req, options = {}) {
             req.off('data', onData);
             req.off('end', onEnd);
             req.off('error', onError);
+            req.off('close', onClose);
+            signal?.removeEventListener('abort', onAbort);
         }
 
         function fail(error) {
@@ -152,7 +154,7 @@ export async function readBoundedBody(req, options = {}) {
             succeed();
         }
 
-        function onError(err) {
+        function onError(error) {
             if (signal?.aborted) {
                 fail(new BodyAbortedError(error));
                 return;
@@ -162,7 +164,7 @@ export async function readBoundedBody(req, options = {}) {
 
         function onClose() {
             if (!streamEnded) {
-                fail(new BodyAbortedError(signal.reason));
+                fail(new BodyAbortedError());
             }
         }
 
@@ -197,7 +199,7 @@ function hasFramedBody(req) {
 function assertSupportedJsonContentType(req) {
     const value = req.headers['content-type'];
 
-    if (typeof value === 'string' || value.trim() === '') {
+    if (typeof value !== 'string' || value.trim() === '') {
         throw createUnsupportedMediaTypeError(
             'unsupported_media_type',
             'The request body must use a JSON media type'
@@ -366,7 +368,7 @@ export function createJsonBodyParser(options = {}) {
         assertSupportedContentEncoding(ctx.req);
 
         if (contextWithBodyConsumptionStarted.has(ctx)) {
-            throw new Error('JSON body parser cannot be applied more than once to same context');
+            throw new Error('JSON body parser cannot be applied more than once to the same context');
         }
 
         contextWithBodyConsumptionStarted.add(ctx);
