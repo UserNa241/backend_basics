@@ -9,7 +9,11 @@
   },
   "scripts": {
     "start": "node src/main.mjs",
-    "check": "node --check src/main.mjs && node --check src/http/server-core.mjs && node --check src/http/router.mjs",
+    "check:src": "node --check src/main.mjs",
+    "check:http": "node --check src/http/middleware.mjs && node --check src/http/router.mjs && node --check src/http/server-core.mjs",
+    "check:test": "node --check test/http/middleware.test.mjs && node --check test/http/router.test.mjs",
+    "check": "npm run check:src && npm run check:http && npm run check:test",
+
     "test": "node --test"
   }
 }
