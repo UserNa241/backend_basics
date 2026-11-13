@@ -1,32 +1,42 @@
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createVanillaApp} from "./app.mjs";
 
-import {createHttpServerCore} from "./http/server-core.mjs";
-
-function temporaryRequestListener(req, res) {
-    const body =
-        'Server core is running. The HTTP adapter has not been assembled yet.\n';
-
-    res.writeHead(503, {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Content-Length': Buffer.byteLength(body),
-    });
-
-    if (req.method === 'HEAD') {
-        res.end();
-        return;
-    }
-    res.end(body);
-}
+const currentDir = path.dirname(fileURLtoPath(import.meta.url));
+const publicRootDir = path.resolve(currentDir, '../public');
 
 const host = process.env.HOST ?? '0.0.0.0';
 const port = Number(process.env.PORT ?? '3000');
 
-const core = createHttpServerCore({
-    requestListener: temporaryRequestListener,
-    host,
-    port,
+const app = createVanillaApp({
+    serverConfig: {
+        host,
+        port,
+    },
+    publicRootDir,
+    routes: [
+        {
+            method: 'GET',
+            pattern: '/api/hello',
+            handler: async (ctx) => {
+                ctx.res.writeHead(200, {'Content-Type': 'application/json'});
+                ctx.res.end(JSON.stringify({message: 'Hello from the Vanilla HTTP adapter'}),);
+            },
+        },
+        {
+            method: "POST",
+            pattern: '/api/echo',
+            handler: async (ctx) => {
+                ctx.res.writeHead(200, {'Content-Type': 'application/json'});
+                ctx.res.end(JSON.stringify({recieved: ctx.body}))
+            },
+        },
+    ],
+    middlewares: [],
 });
 
 let shutdownStarted = false;
+
 async function shutdown(signal) {
     if (shutdownStarted) {
         return;
@@ -36,30 +46,21 @@ async function shutdown(signal) {
     console.log(`Recieved ${signal}; shutting down gracefully...`);
 
     try {
-        await core.stop();
-    } catch (error) {
-        console.error('Graceful shutdown failed:', error);
+        await app.stop();
+    } catch (err) {
+        console.error('Graceful shutdown failed:', err);
         process.exitCode = 1;
     }
 }
-
-process.once('SIGINT', () => {
+process.once ('SIGINT', () => {
     void shutdown('SIGINT');
 });
 
 process.once('SIGTERM', () => {
     void shutdown('SIGTERM');
-})
+});
 
-const address = await core.start();
+const address = await app.start();
 
-console.log(
-    `HTTP server core listening on http://${address.address}:${address.port}`,
-);
-
-
-
-
-
-
+console.log(`Vanilla HTTP adapter listening on http://${address.address}:${address.port}`);
 
