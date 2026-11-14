@@ -1,8 +1,8 @@
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
+import { fileURLToPath } from 'node:url';
 import {createVanillaApp} from "./app.mjs";
 
-const currentDir = path.dirname(fileURLtoPath(import.meta.url));
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const publicRootDir = path.resolve(currentDir, '../public');
 
 const host = process.env.HOST ?? '0.0.0.0';
@@ -28,7 +28,7 @@ const app = createVanillaApp({
             pattern: '/api/echo',
             handler: async (ctx) => {
                 ctx.res.writeHead(200, {'Content-Type': 'application/json'});
-                ctx.res.end(JSON.stringify({recieved: ctx.body}))
+                ctx.res.end(JSON.stringify({received: ctx.body}))
             },
         },
     ],
@@ -43,7 +43,7 @@ async function shutdown(signal) {
     }
 
     shutdownStarted = true;
-    console.log(`Recieved ${signal}; shutting down gracefully...`);
+    console.log(`Received ${signal}; shutting down gracefully...`);
 
     try {
         await app.stop();
@@ -62,5 +62,5 @@ process.once('SIGTERM', () => {
 
 const address = await app.start();
 
-console.log(`Vanilla HTTP adapter listening on http://${address.address}:${address.port}`);
+console.log(`Vanilla HTTP adapter listening on http://http://localhost:3000/`);
 
