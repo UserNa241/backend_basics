@@ -12,7 +12,12 @@
     "check:src": "node --check src/main.mjs",
     "check:http": "node --check src/http/middleware.mjs && node --check src/http/router.mjs && node --check src/http/server-core.mjs && node --check src/http/body.mjs && node --check src/http/error.mjs && node --check src/http/static.mjs && node --check src/app.mjs",
     "check:test": "node --check test/http/middleware.test.mjs && node --check test/http/router.test.mjs && node --check test/http/body.test.mjs && node --check test/http/error.test.mjs && node --check test/http/static.test.mjs && node --check test/http/app.test.mjs",
-    "check": "npm run check:src && npm run check:http && npm run check:test",
+    "check:db": "node --check src/db/pool.mjs && node --check test/db/pool.test.mjs",
+    "check": "npm run check:src && npm run check:http",
     "test": "node --test"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "pg": "^8.23.1"
   }
 }
