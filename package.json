@@ -14,6 +14,7 @@
     "check:test": "node --check test/http/middleware.test.mjs && node --check test/http/router.test.mjs && node --check test/http/body.test.mjs && node --check test/http/error.test.mjs && node --check test/http/static.test.mjs && node --check test/http/app.test.mjs",
     "check:db": "node --check src/db/pool.mjs && node --check test/db/pool.test.mjs",
     "check": "npm run check:src && npm run check:http",
+    "migrate": "node src/db/migrate.mjs",
     "test": "node --test"
   },
   "dependencies": {
