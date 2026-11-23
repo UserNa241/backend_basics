@@ -9,19 +9,27 @@
   },
   "scripts": {
     "start": "node src/main.mjs",
-    "check:src:root": "node --check src/main.mjs && node --check src/app.mjs",
-    "check:http:core": "node --check src/http/server-core.mjs && node --check src/http/router.mjs && node --check src/http/middleware.mjs",
-    "check:http:utils": "node --check src/http/body.mjs && node --check src/http/error.mjs && node --check src/http/static.mjs",
-    "check:http": "npm run check:http:core && npm run check:http:utils",
-    "check:db:src": "node --check src/db/pool.mjs && node --check src/db/migrate.mjs && node --check src/db/repository.mjs",
-    "check:db:test": "node --check test/db/pool.test.mjs && node --check test/db/migrate.test.mjs && node --check test/db/repository.test.mjs",
-    "check:db": "npm run check:db:src && npm run check:db:test",
-    "check:test:core": "node --check test/http/app.test.mjs && node --check test/http/router.test.mjs && node --check test/http/middleware.test.mjs",
-    "check:test:utils": "node --check test/http/body.test.mjs && node --check test/http/error.test.mjs && node --check test/http/static.test.mjs",
-    "check:test": "npm run check:test:core && npm run check:test:utils",
-    "check": "npm run check:src:root && npm run check:http && npm run check:db:src",
     "migrate": "node src/db/migrate.mjs",
-    "test": "node --test"
+    "test": "node --test",
+
+    "check:main": "node --check src/main.mjs",
+    "check:app": "node --check src/app.mjs && node --check test/http/app.test.mjs",
+
+    "check:http:core": "node --check src/http/server-core.mjs",
+    "check:http:router": "node --check src/http/router.mjs && node --check test/http/router.test.mjs",
+    "check:http:middleware": "node --check src/http/middleware.mjs && node --check test/http/middleware.test.mjs",
+    "check:http:body": "node --check src/http/body.mjs && node --check test/http/body.test.mjs",
+    "check:http:error": "node --check src/http/error.mjs && node --check test/http/error.test.mjs",
+    "check:http:static": "node --check src/http/static.mjs && node --check test/http/static.test.mjs",
+    "check:http": "npm run check:http:core && npm run check:http:router && npm run check:http:middleware && npm run check:http:body && npm run check:http:error && npm run check:http:static",
+
+    "check:db:pool": "node --check src/db/pool.mjs && node --check test/db/pool.test.mjs",
+    "check:db:migrate": "node --check src/db/migrate.mjs && node --check test/db/migrate.test.mjs",
+    "check:db:repository": "node --check src/db/repository.mjs && node --check test/db/repository.test.mjs",
+    "check:db:seed": "node --check src/db/seed.mjs && node --check src/db/seed-data.mjs && node --check test/db/seed.test.mjs",
+    "check:db": "npm run check:db:pool && npm run check:db:migrate && npm run check:db:repository && npm run check:db:seed",
+
+    "check": "npm run check:main && npm run check:app && npm run check:http && npm run check:db"
   },
   "dependencies": {
     "dotenv": "^18.0.10",
