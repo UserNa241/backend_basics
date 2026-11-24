@@ -16,6 +16,8 @@
     "check:main": "node --check src/main.mjs",
     "check:app": "node --check src/app.mjs && node --check test/http/app.test.mjs",
     "check:app-service": "node --check src/app-service.mjs && node --check test/app-service.test.mjs",
+    "check:app-validation": "node --check src/app-validation.mjs && node --check test/app-validation.test.mjs",
+    "check:app-": "npm run check:app-service && npm run check:app-validation",
 
     "check:http:core": "node --check src/http/server-core.mjs",
     "check:http:router": "node --check src/http/router.mjs && node --check test/http/router.test.mjs",
@@ -31,7 +33,7 @@
     "check:db:seed": "node --check src/db/seed.mjs && node --check src/db/seed-data.mjs && node --check test/db/seed.test.mjs",
     "check:db": "npm run check:db:pool && npm run check:db:migrate && npm run check:db:repository && npm run check:db:seed",
 
-    "check": "npm run check:main && npm run check:app && npm run check:app-service && npm run check:http && npm run check:db"
+    "check": "npm run check:main && npm run check:app && npm run check:app- && npm run check:http && npm run check:db"
   },
   "dependencies": {
     "dotenv": "^18.0.10",

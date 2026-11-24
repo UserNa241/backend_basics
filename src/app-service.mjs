@@ -16,6 +16,17 @@
 // you pass the real repository, in a test you pass a mock, and the
 // service code is identical in both cases.
 
+// The service depends on the repository's interface, not on the
+// database. That boundary is the seam (S6 Lesson 8): in production
+// you pass the real repository, in a test you pass a mock, and the
+// service code is identical in both cases.
+
+import {
+    validateEmail,
+    validateRequired,
+    validateStatus,
+} from "./app-validation.mjs";
+
 /**
  * Converts a raw user row from the database into a client-facing DTO.
  *
@@ -103,6 +114,12 @@ export function createAppService(repo) {
      * @returns {Promise<object>} The created user as a DTO.
      */
     async function createUser(input) {
+        //Validate required fields are present and non-empty strings
+        validateRequired(input, ['email', 'name', 'passwordHash']);
+
+        //Validate the email looks like email
+        validateEmail(input.email);
+
         const row = await repo.insertUser(input);
         return toUserDto(row);
     }
@@ -117,6 +134,9 @@ export function createAppService(repo) {
      * @returns {Promise<object>} The user as a DTO, or null if not found.
      */
     async function getUserByEmail(email) {
+        //Validate email looks like email
+        validateEmail(email);
+
         const row = await repo.getUserByEmail(email);
         return row ? toUserDto(row) : null;
     }
@@ -147,6 +167,9 @@ export function createAppService(repo) {
      * @returns {Promise<object>} The created project as a DTO.
      */
     async function createProject(input) {
+        //Validate required fields are present and non-empty strings
+        validateRequired(input, ['ownerId', 'name']);
+
         const row = await repo.insertProject(input);
         return toProjectDto(row);
     }
@@ -191,6 +214,12 @@ export function createAppService(repo) {
      * @returns {Promise<object>} The created task as a DTO.
      */
     async function createTask(input) {
+        //Validate required fields are present and non-empty strings
+        validateRequired(input, ['projectId', 'title', 'status']);
+
+        //Validate the status is one of the allowed values
+        validateStatus(input.status);
+
         const row = await repo.insertTask(input);
         return toTaskDto(row);
     }
@@ -221,6 +250,9 @@ export function createAppService(repo) {
      * @returns {Promise<object>} The updated task as a DTO, or null if not found.
      */
     async function updateTaskStatus (id, status) {
+        //Validate the status is one of the allowed values
+        validateStatus(status);
+
         const row = await repo.updateTaskStatus(id, status);
         return row ? toTaskDto(row) : null;
     }
