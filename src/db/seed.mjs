@@ -68,7 +68,7 @@ if (isDirectRun) {
         port: 5432,
         database: 'web_product',
         user: 'app_user',
-        password: 'app_password',
+        password: 'mission',
         max: 5,
     });
 
